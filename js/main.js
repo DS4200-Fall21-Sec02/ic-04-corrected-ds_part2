@@ -1,5 +1,4 @@
 
-
 // write your javascript code here.
 // feel free to change the pre-set attributes as you see fit
 
@@ -57,7 +56,7 @@ d3.csv("data/data.csv").then(function (data) {
 
     //y axis
     const y = d3.scaleLinear()
-        .domain([0,100])
+        .domain([0,150])
         .range([height, 0]);
 
 
@@ -101,14 +100,14 @@ d3.csv("data/data.csv").then(function (data) {
             .data(d => col.map(key => ({key, value: d[key]})))
             .join("rect")
             .attr("x", d => x1(d.key) + 15 + margin.left)
-            .attr("y", d => y(d.value))
+            .attr("y", d => y(d.value) + downshift)
             .attr("width", x1.bandwidth())
-            .attr("height", d => height + downshift - y(d.value))
+            .attr("height", d => height - y(d.value))
             .attr("fill", staticColor )
             .on('mouseover', function (d, i) {
           tooltip
             .html(
-              `<div>Value: ${d.x}</div>`
+              `<div>Value: ${i.value}</div>`
             )
             .style('visibility', 'visible');
           d3.select(this).transition().attr('fill', hoverColor);
