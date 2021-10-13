@@ -21,12 +21,27 @@ let svg1 = d3.select('#d3-container')
   .style('border', 'solid')
   .attr('viewBox', [0, 0, width + margin.left + margin.right, height + margin.top + margin.bottom].join(' '))
 
+tooltip = d3
+    .select('body')
+    .append('div')
+    .attr('class', 'd3-tooltip')
+    .style('position', 'absolute')
+    .style('z-index', '10')
+    .style('visibility', 'hidden')
+    .style('padding', '10px')
+    .style('background', 'rgba(0,0,0,0.6)')
+    .style('border-radius', '4px')
+    .style('color', '#fff')
+    .text('a simple tooltip');
+
 
 //read data
 
 d3.csv("data/data.csv").then(function (data) {
 
     const downshift = 30;
+    //rows
+    const rowsList = ["A", "B", "C", "D", "E", "F", "G"]
 
     //number of columns
     const col = data.columns.slice(1);
@@ -34,8 +49,11 @@ d3.csv("data/data.csv").then(function (data) {
     //number of rows
     const r =  data.map( d => d.x);
 
+    const hoverColor = "#FFC0CB";
+    const staticColor = '#ADD8E6';
+
     //x axis
-    const x = d3.scaleBand().domain(r).range([0, width + 30]).padding(1,2);
+    const x = d3.scaleBand().domain(rowsList).range([0, width + 30]).padding(1,2);
 
     //y axis
     const y = d3.scaleLinear()
@@ -64,14 +82,13 @@ d3.csv("data/data.csv").then(function (data) {
 
 
     xAxis = g => g
-     .attr("transform", `translate(35, ${height + downshift})`)
+     .attr("transform", `translate(45, ${height + downshift})`)
         .call(d3.axisBottom(x).tickSize(0));
 
 
 
 
-
-             svg1.append("g")
+    svg1.append("g")
       .call(xAxis);
 
 
@@ -87,9 +104,30 @@ d3.csv("data/data.csv").then(function (data) {
             .attr("y", d => y(d.value))
             .attr("width", x1.bandwidth())
             .attr("height", d => height + downshift - y(d.value))
-            .attr("fill",'#ADD8E6' );
+            .attr("fill", staticColor )
+            .on('mouseover', function (d, i) {
+          tooltip
+            .html(
+              `<div>Value: ${d.x}</div>`
+            )
+            .style('visibility', 'visible');
+          d3.select(this).transition().attr('fill', hoverColor);
+      }).on('mousemove', function () {
+          tooltip
+            .style('top', d3.event.pageY - 10 + 'px')
+            .style('left', d3.event.pageX + 10 + 'px');
+      })
+      .on('mouseout', function () {
+          tooltip.html(``).style('visibility', 'hidden');
+          d3.select(this).transition().attr('fill', staticColor);
+      })
 
+ // svg1.append("g")
+ //    .attr("transform", `translate(0, ${height})`)
+ //    .call(d3.axisBottom(x).tickSize(0));
 
+ //    svg1.append("g")
+ //    .call(legend);
 
    
 
